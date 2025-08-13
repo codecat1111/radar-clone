@@ -50,53 +50,59 @@ function App() {
   return (
     <MainLayout>
       <div className="relative w-full h-full flex items-center justify-center">
-        {loading && technologies.length === 0 ? (
-          <LoadingSpinner size="xl" />
-        ) : error ? (
-          <div className="text-center">
-            <div className="text-red-600 text-xl font-semibold mb-2">Error</div>
-            <div className="text-gray-600">{error}</div>
-          </div>
-        ) : (
-          <>
-            <div
-              style={{
-                transform: `scale(${zoomLevel})`,
-                transition: "transform 0.3s ease",
-              }}
-            >
-              <RadarChart
-                technologies={technologies}
-                onTechnologyClick={handleTechnologyClick}
-              />
+        <div className="transition-all duration-300 ease-in-out">
+          {loading && technologies.length === 0 ? (
+            <div className="animate-fadeIn">
+              <LoadingSpinner size="xl" />
             </div>
+          ) : error ? (
+            <div className="text-center animate-fadeIn">
+              <div className="text-red-600 text-xl font-semibold mb-2">
+                Error
+              </div>
+              <div className="text-gray-600">{error}</div>
+            </div>
+          ) : (
+            <div className="animate-fadeIn">
+              <div
+                style={{
+                  transform: `scale(${zoomLevel})`,
+                  transition: "transform 0.3s ease-in-out",
+                }}
+              >
+                <RadarChart
+                  technologies={technologies}
+                  onTechnologyClick={handleTechnologyClick}
+                />
+              </div>
+            </div>
+          )}
+        </div>
 
-            {/* Glassmorphism Zoom Controls */}
-            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full p-2 border border-white/30 shadow-lg">
-              <button
-                onClick={handleZoomOut}
-                className="w-10 h-10 rounded-full bg-white/30 hover:bg-white/40 backdrop-blur-sm border border-white/40 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-all duration-200"
-              >
-                −
-              </button>
-              <button
-                onClick={handleZoomReset}
-                className="w-10 h-10 rounded-full bg-white/30 hover:bg-white/40 backdrop-blur-sm border border-white/40 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-all duration-200"
-              >
-                ⌂
-              </button>
-              <button
-                onClick={handleZoomIn}
-                className="w-10 h-10 rounded-full bg-white/30 hover:bg-white/40 backdrop-blur-sm border border-white/40 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-all duration-200"
-              >
-                +
-              </button>
-            </div>
-          </>
-        )}
+        {/* Glassmorphism Zoom Controls - moved outside conditional */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full p-2 border border-white/30 shadow-lg">
+          <button
+            onClick={handleZoomOut}
+            className="w-10 h-10 rounded-full bg-white/30 hover:bg-white/40 backdrop-blur-sm border border-white/40 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-all duration-200"
+          >
+            −
+          </button>
+          <button
+            onClick={handleZoomReset}
+            className="w-10 h-10 rounded-full bg-white/30 hover:bg-white/40 backdrop-blur-sm border border-white/40 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-all duration-200"
+          >
+            ⌂
+          </button>
+          <button
+            onClick={handleZoomIn}
+            className="w-10 h-10 rounded-full bg-white/30 hover:bg-white/40 backdrop-blur-sm border border-white/40 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-all duration-200"
+          >
+            +
+          </button>
+        </div>
 
         {!loading && technologies.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+          <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm animate-fadeIn">
             <div className="text-center p-6 bg-white rounded-lg shadow-lg border">
               <div className="text-gray-400 mb-2">
                 <svg

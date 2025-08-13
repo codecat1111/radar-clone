@@ -55,39 +55,59 @@ const RadarChart = ({ technologies = [], onTechnologyClick }) => {
 
     // Draw background circle
     g.append("circle")
-      .attr("r", RADAR_CONFIG.maxRadius)
+      .attr("r", 0)
       .attr("fill", "url(#radarGradient)")
       .attr("stroke", "#666")
-      .attr("stroke-width", 2);
+      .attr("stroke-width", 2)
+      .transition()
+      .duration(1500)
+      .ease(d3.easeCircle)
+      .attr("r", RADAR_CONFIG.maxRadius);
+
     // Add outer boundary circle (green)
     const outerRadius = RADAR_CONFIG.maxRadius + 20;
     g.append("circle")
-      .attr("r", outerRadius)
+      .attr("r", 0) // Start with 0 radius
       .attr("fill", "none")
       .attr("stroke", "#4CAF50")
-      .attr("stroke-width", 3);
+      .attr("stroke-width", 3)
+      .transition()
+      .duration(500)
+      .ease(d3.easeCircle)
+      .attr("r", outerRadius);
 
     // Draw grid circles
     const gridCircles = [0.25, 0.5, 0.75, 1.0];
-    gridCircles.forEach((ratio) => {
+    gridCircles.forEach((ratio, index) => {
       g.append("circle")
-        .attr("r", RADAR_CONFIG.maxRadius * ratio)
+        .attr("r", 0) // Start with 0 radius
         .attr("fill", "none")
         .attr("stroke", "rgba(255,255,255,0.3)")
-        .attr("stroke-width", 1);
+        .attr("stroke-width", 1)
+        .transition()
+        .duration(400)
+        .delay(index * 100) // Staggered animation
+        .ease(d3.easeCircle)
+        .attr("r", RADAR_CONFIG.maxRadius * ratio);
     });
 
     // Draw grid lines
-    const gridLines = 4; // Only 4 lines: top, right, bottom, left
+    const gridLines = 4;
     for (let i = 0; i < gridLines; i++) {
-      const angle = i * 90 * (Math.PI / 180); // 90-degree intervals
+      const angle = i * 90 * (Math.PI / 180);
       g.append("line")
         .attr("x1", 0)
         .attr("y1", 0)
-        .attr("x2", Math.cos(angle - Math.PI / 2) * RADAR_CONFIG.maxRadius)
-        .attr("y2", Math.sin(angle - Math.PI / 2) * RADAR_CONFIG.maxRadius)
+        .attr("x2", 0) // Start with 0 length
+        .attr("y2", 0)
         .attr("stroke", "rgba(255,255,255,0.3)")
-        .attr("stroke-width", 1);
+        .attr("stroke-width", 1)
+        .transition()
+        .duration(400)
+        .delay(i * 50) // Staggered animation
+        .ease(d3.easeLinear)
+        .attr("x2", Math.cos(angle - Math.PI / 2) * RADAR_CONFIG.maxRadius)
+        .attr("y2", Math.sin(angle - Math.PI / 2) * RADAR_CONFIG.maxRadius);
     }
 
     // Add impact and effort labels around the outer circle
@@ -145,7 +165,49 @@ const RadarChart = ({ technologies = [], onTechnologyClick }) => {
     // Draw technology points
     g.selectAll(".radar-point")
       .data(technologies)
-      .enter()
+      .join(
+        (enter) =>
+          enter
+            .append("circle")
+            .attr("class", "radar-point")
+            .attr("cx", (d) => getCartesian(d.angle, d.radius).x)
+            .attr("cy", (d) => getCartesian(d.angle, d.radius).y)
+            .attr("r", 0) // Start with 0 radius
+            .attr("fill", (d) => d.tag?.color || "#9CA3AF")
+            .attr("stroke", "#FFFFFF")
+            .attr("stroke-width", 2)
+            .style("cursor", "pointer")
+            .style("opacity", 0) // Start invisible
+            .call((enter) =>
+              enter
+                .transition()
+                .duration(300)
+                .attr("r", RADAR_CONFIG.pointRadius)
+                .style("opacity", 1)
+                .on("end", function () {
+                  d3.select(this).on("click", (event, d) => {
+                    event.stopPropagation();
+                    if (onTechnologyClick) {
+                      onTechnologyClick(d);
+                    }
+                  });
+                })
+            ),
+        (update) =>
+          update
+            .transition()
+            .duration(300)
+            .attr("cx", (d) => getCartesian(d.angle, d.radius).x)
+            .attr("cy", (d) => getCartesian(d.angle, d.radius).y)
+            .attr("fill", (d) => d.tag?.color || "#9CA3AF"),
+        (exit) =>
+          exit
+            .transition()
+            .duration(300)
+            .attr("r", 0)
+            .style("opacity", 0)
+            .remove()
+      )
       .append("circle")
       .attr("class", "radar-point")
       .attr("cx", (d) => getCartesian(d.angle, d.radius).x)
@@ -156,6 +218,7 @@ const RadarChart = ({ technologies = [], onTechnologyClick }) => {
       .attr("stroke-width", 2)
       .style("cursor", "pointer")
       .on("click", (event, d) => {
+        event.stopPropagation(); // Prevent event bubbling
         if (onTechnologyClick) {
           onTechnologyClick(d);
         }
