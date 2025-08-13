@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global CSS Variables */
+:root {
+  /* Radar Background Gradient */
+  --radar-gradient-start: #8fbc8f;
+  --radar-gradient-middle: #daa520;
+  --radar-gradient-end: #cd853f;
+
+  /* Tag Colors */
+  --tag-leading: #90ee90;
+  --tag-nascent: #ffb6c1;
+  --tag-watchlist: #87ceeb;
+
+  /* UI Colors */
+  --primary-blue: #4a90e2;
+  --secondary-blue: #e3f2fd;
+  --filter-bg: #f8fafc;
+  --filter-border: #e2e8f0;
+  --benefit-bg: #f0f9ff;
+  --risk-bg: #fef2f2;
+}
+
+/* Custom radar chart styles */
+.radar-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radar-background {
+  fill: url(#radarGradient);
+  stroke: #ffffff;
+  stroke-width: 3;
+  filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.1));
+}
+
+.radar-grid-line {
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 1;
+}
+
+.radar-grid-circle {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.2);
+  stroke-width: 1;
+}
+
+.radar-point {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.radar-point:hover {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  transform: scale(1.2);
+}
+
+.radar-point.filtered-out {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Tooltip styles */
+.radar-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 1000;
+  transition: opacity 0.2s ease;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Filter panel animations */
+.filter-option {
+  transition: all 0.2s ease;
+}
+
+.filter-option:hover {
+  background-color: rgba(74, 144, 226, 0.1);
+  transform: translateX(2px);
+}
+
+.filter-option.active {
+  background-color: rgba(74, 144, 226, 0.2);
+  border-color: var(--primary-blue);
+}
+
+/* Detail panel animations */
+.detail-panel-enter {
+  transform: translateX(100%);
+}
+
+.detail-panel-enter-active {
+  transform: translateX(0);
+  transition: transform 0.3s ease-out;
+}
+
+.detail-panel-exit {
+  transform: translateX(0);
+}
+
+.detail-panel-exit-active {
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in;
+}
+
+/* Focus styles for accessibility */
+button:focus,
+input:focus,
+select:focus {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid var(--primary-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive design helpers */
+@media (max-width: 1024px) {
+  .radar-container {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-panel {
+    position: fixed;
+    left: -100%;
+    transition: left 0.3s ease;
+    z-index: 50;
+  }
+
+  .filter-panel.open {
+    left: 0;
+  }
+}
