@@ -194,3 +194,96 @@ select:focus {
 .transition-smooth {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out 0.4s forwards;
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.3s ease-out forwards;
+}
+
+/* Right panel slide-in animation */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.4s ease-out forwards;
+}
+
+/* Content fade and slide animation for technology changes */
+@keyframes content-fade-slide {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-content-change {
+  animation: content-fade-slide 0.5s ease-out forwards;
+}
+
+/* Staggered animation for content sections */
+@keyframes stagger-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-stagger {
+  opacity: 0;
+  animation: stagger-fade-in 0.4s ease-out forwards;
+}
+
+/* Panel transition when technology changes */
+.detail-panel-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.detail-panel-fade-out {
+  opacity: 0;
+  transform: translateX(10px);
+}
+
+.detail-panel-fade-in {
+  opacity: 1;
+  transform: translateX(0);
+}

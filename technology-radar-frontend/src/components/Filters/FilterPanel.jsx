@@ -5,16 +5,43 @@ import { useFilters } from "../../hooks/useFilters";
 import SearchFilter from "./SearchFilter";
 import TagFilter from "./TagFilter";
 import DomainFilter from "./DomainFilter";
+import TechnologyFilter from "./TechnologyFilter";
 import ImpactFilter from "./ImpactFilter";
 import EffortFilter from "./EffortFilter";
 import FilterActions from "./FilterActions";
+import ViewModeToggle from "./ViewModeToggle";
 import { LoadingSpinner } from "../UI";
 
 const FilterPanel = () => {
-  const { isFilterPanelExpanded, toggleFilterPanel, filteredTechnologies } =
-    useAppStore();
+  const {
+    isFilterPanelExpanded,
+    toggleFilterPanel,
+    filteredTechnologies,
+    filters,
+    getTechnologiesByDomain,
+    technologies,
+  } = useAppStore();
 
   const { filterOptions, loading } = useFilters();
+
+  // Get technologies for selected domain
+  const selectedDomainTechnologies = React.useMemo(() => {
+    if (!filters.selectedDomain) return [];
+    return getTechnologiesByDomain(filters.selectedDomain);
+  }, [filters.selectedDomain, getTechnologiesByDomain]);
+  console.log("=== FilterPanel Debug ===");
+  console.log("viewMode:", filters.viewMode);
+  console.log("selectedDomain:", filters.selectedDomain);
+  console.log("selectedDomainTechnologies:", selectedDomainTechnologies);
+  console.log(
+    "selectedDomainTechnologies.length:",
+    selectedDomainTechnologies.length
+  );
+  console.log(
+    "Condition result:",
+    filters.selectedDomain && selectedDomainTechnologies.length > 0
+  );
+  console.log("========================");
 
   if (!isFilterPanelExpanded) {
     return (
@@ -65,25 +92,63 @@ const FilterPanel = () => {
             </div>
           </div>
 
-          {/* Search Bar - Now inside blue container */}
-          <SearchFilter />
+          {/* Search Bar - Only show in radar mode */}
+          {filters.viewMode === "radar" && <SearchFilter />}
         </div>
       </div>
 
       {/* Scrollable Filter Content */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6 bg-blue-50">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 bg-blue-50">
         {loading ? (
           <div className="flex justify-center py-8">
             <LoadingSpinner />
           </div>
         ) : (
-          <>
-            <FilterActions />
-            <TagFilter tags={filterOptions?.tags || []} />
-            <DomainFilter domains={filterOptions?.domains || []} />
-            <ImpactFilter impactLevels={filterOptions?.impact_levels || []} />
-            <EffortFilter effortLevels={filterOptions?.effort_levels || []} />
-          </>
+          <div className="space-y-6">
+            <ViewModeToggle />
+            {filters.viewMode === "radar" && (
+              <div
+                key={filters.viewMode}
+                className="space-y-6 opacity-0 animate-fade-in"
+              >
+                <FilterActions />
+                <TagFilter tags={filterOptions?.tags || []} />
+                <DomainFilter domains={filterOptions?.domains || []} />
+                <ImpactFilter
+                  impactLevels={filterOptions?.impact_levels || []}
+                />
+                <EffortFilter
+                  effortLevels={filterOptions?.effort_levels || []}
+                />
+              </div>
+            )}
+
+            {/* Radial mode filters */}
+            {filters.viewMode === "radial" && (
+              <div className="space-y-6">
+                <DomainFilter
+                  domains={filterOptions?.domains || []}
+                  radialMode={true}
+                />
+
+                {/* Technology filter - only show when domain is selected */}
+                {filters.selectedDomain &&
+                  selectedDomainTechnologies.length > 0 && (
+                    <div
+                      className="opacity-0 animate-slide-down"
+                      style={{
+                        animationDelay: "300ms",
+                        animationFillMode: "forwards",
+                      }}
+                    >
+                      <TechnologyFilter
+                        technologies={selectedDomainTechnologies}
+                      />
+                    </div>
+                  )}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

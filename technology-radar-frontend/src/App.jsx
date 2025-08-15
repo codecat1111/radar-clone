@@ -1,6 +1,6 @@
 import React from "react";
 import { MainLayout } from "./components/Layout";
-import { RadarChart } from "./components/RadarChart";
+import { RadarChart, RadialChart } from "./components/RadarChart";
 import { useRadarData } from "./hooks/useRadarData";
 import { useTechnologyDetail } from "./hooks/useTechnologyDetail";
 import { technologyService } from "./services/technologyService";
@@ -10,6 +10,31 @@ import { useState } from "react";
 function App() {
   const { technologies, loading, error } = useRadarData();
   const { setSelectedTechnology } = useAppStore();
+  const { filters } = useAppStore();
+
+  // Derive domains from technologies
+  const domains = React.useMemo(() => {
+    if (!technologies.length) return [];
+
+    const domainMap = new Map();
+    technologies.forEach((tech) => {
+      const domainName =
+        typeof tech.domain === "string" ? tech.domain : tech.domain?.name;
+      if (domainName) {
+        if (!domainMap.has(domainName)) {
+          domainMap.set(domainName, {
+            id: domainName,
+            name: domainName,
+            color: tech.domain?.color || "#4A90E2",
+            count: 0,
+          });
+        }
+        domainMap.get(domainName).count++;
+      }
+    });
+
+    return Array.from(domainMap.values());
+  }, [technologies]);
 
   //Add state for zoom level
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -20,20 +45,25 @@ function App() {
   const handleZoomReset = () => setZoomLevel(1);
 
   const handleTechnologyClick = async (technology) => {
-    try {
-      const response = await technologyService.getTechnologyById(
-        technology.id,
-        true
-      );
-      if (response.success) {
-        setSelectedTechnology(response.data.technology);
-      } else {
+    // Add a small transition delay for smoother UX
+    setSelectedTechnology(null); // Clear current selection first
+
+    setTimeout(async () => {
+      try {
+        const response = await technologyService.getTechnologyById(
+          technology.id,
+          true
+        );
+        if (response.success) {
+          setSelectedTechnology(response.data.technology);
+        } else {
+          setSelectedTechnology(technology);
+        }
+      } catch (error) {
+        console.error("Error fetching technology details:", error);
         setSelectedTechnology(technology);
       }
-    } catch (error) {
-      console.error("Error fetching technology details:", error);
-      setSelectedTechnology(technology);
-    }
+    }, 150); // Small delay for smooth transition
   };
 
   if (error) {
@@ -70,10 +100,18 @@ function App() {
                   transition: "transform 0.3s ease-in-out",
                 }}
               >
-                <RadarChart
-                  technologies={technologies}
-                  onTechnologyClick={handleTechnologyClick}
-                />
+                {filters.viewMode === "radar" ? (
+                  <RadarChart
+                    technologies={technologies}
+                    onTechnologyClick={handleTechnologyClick}
+                  />
+                ) : (
+                  <RadialChart
+                    technologies={technologies}
+                    domains={domains}
+                    onTechnologyClick={handleTechnologyClick}
+                  />
+                )}
               </div>
             </div>
           )}

@@ -116,20 +116,9 @@ const useAppStore = create((set, get) => ({
       },
     })),
 
-  // Filter count helper
-  getActiveFilterCount: () => {
-    const { filters } = get();
-    return (
-      filters.domains.length +
-      filters.tags.length +
-      filters.impactLevels.length +
-      filters.effortLevels.length +
-      (filters.search ? 1 : 0)
-    );
-  },
-
   //Get Active Filter Count
   getActiveFilterCount: () => {
+    const { filters } = get();
     return (
       filters.domains.length +
       filters.tags.length +
@@ -142,7 +131,11 @@ const useAppStore = create((set, get) => ({
   // Get tech by domain
   getTechnologiesByDomain: (domain) => {
     const { technologies } = get();
-    return technologies.filter((tech) => tech.domain === domain);
+    return technologies.filter((tech) => {
+      const techDomain =
+        typeof tech.domain === "string" ? tech.domain : tech.domain?.name;
+      return techDomain === domain;
+    });
   },
 
   //Get Unique Domains

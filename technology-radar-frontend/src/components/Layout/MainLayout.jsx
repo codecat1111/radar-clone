@@ -6,8 +6,12 @@ import DetailPanel from "../TechnologyDetail/DetailPanel";
 import useAppStore from "../../store/useAppStore";
 
 const MainLayout = ({ children }) => {
-  const { isFilterPanelExpanded, isDetailPanelOpen, selectedTechnology } =
-    useAppStore();
+  const {
+    isFilterPanelExpanded,
+    isDetailPanelOpen,
+    selectedTechnology,
+    filters,
+  } = useAppStore();
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -41,10 +45,10 @@ const MainLayout = ({ children }) => {
           {/* Radar Chart Area */}
           <div className="flex-1 p-6 overflow-auto">{children}</div>
 
-          {/* Right Detail Panel */}
+          {/* Right Detail Panel - Enhanced with animations */}
           {isDetailPanelOpen && selectedTechnology && (
-            <aside className="w-96 bg-white border-l border-gray-200 animate-slide-in-right overflow-hidden">
-              <DetailPanel />
+            <aside className="w-96 bg-white border-l border-gray-200 overflow-hidden animate-slide-in-right">
+              <DetailPanel key={selectedTechnology.id} />
             </aside>
           )}
         </div>
